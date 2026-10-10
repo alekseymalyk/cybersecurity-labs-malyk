@@ -10,3 +10,27 @@
 
 У кожній папці є README з інструкцією запуску і папка `screenshots/`.
 Для всіх робіт потрібен тільки Python 3.
+
+## Як запустити
+
+```
+git clone https://github.com/alekseymalyk/cybersecurity-labs-malyk.git
+cd cybersecurity-labs-malyk
+```
+
+Лабораторна 1 (перевірка пароля):
+
+```
+cd lab01
+python3 passcheck.py
+```
+
+Лабораторна 2 (шифри Цезаря і Віженера):
+
+```
+cd lab02
+python3 ciphers.py
+```
+
+Особисті дані (ім'я, прізвище, дата народження) записані змінними на початку кожного файлу,
+їх можна замінити на свої.
