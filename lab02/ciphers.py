@@ -1,19 +1,19 @@
-# Лабораторна робота 2. Шифр Цезаря і шифр Віженера
-# Автор: Малик Олексій
+# ЛР2 Захист особистих повідомлень
+# шифр Цезаря і шифр Віженера для українського тексту
+# Малик Олексій, 6.04.122.010.23.1
 
-# український алфавіт (33 літери)
-alphabet = "абвгґдеєжзиіїйклмнопрстуфхцчшщьюя"
+alphabet = "абвгґдеєжзиіїйклмнопрстуфхцчшщьюя"   # 33 букви
 
-# мої дані для ключів
+# ключі беру зі своїх даних
 birth_date = "23.12.2005"
 surname = "малик"
 
-# мій текст для перевірки
+# цей текст береться якщо нічого не ввести
 my_text = "Зустрінемось біля бібліотеки ХНЕУ о пів на третю"
 
 
+# ключ для Цезаря: складаю всі цифри дати (2+3+1+2+2+0+0+5 = 15)
 def make_caesar_key(date):
-    # зсув = сума цифр дати народження
     total = 0
     for c in date:
         if c.isdigit():
@@ -21,74 +21,84 @@ def make_caesar_key(date):
     return total
 
 
+# зсуває одну букву на shift позицій
+# якщо це не буква з алфавіту (пробіл, цифра, латиниця) то повертаю як є
 def shift_letter(c, shift):
-    # зсуває одну літеру по алфавіту, інші символи не змінює
-    low = c.lower()
-    if low not in alphabet:
+    small = c.lower()
+    if small not in alphabet:
         return c
-    pos = alphabet.index(low)
+    pos = alphabet.index(small)
+    # % щоб після "я" знову почати з "а"
     new_pos = (pos + shift) % len(alphabet)
-    new_letter = alphabet[new_pos]
+    letter = alphabet[new_pos]
     if c.isupper():
-        new_letter = new_letter.upper()
-    return new_letter
+        letter = letter.upper()
+    return letter
 
 
 def caesar_encrypt(text, shift):
-    result = ""
+    res = ""
     for c in text:
-        result = result + shift_letter(c, shift)
-    return result
+        res = res + shift_letter(c, shift)
+    return res
 
 
 def caesar_decrypt(text, shift):
-    result = ""
+    res = ""
     for c in text:
-        result = result + shift_letter(c, -shift)
-    return result
+        res = res + shift_letter(c, -shift)
+    return res
 
 
-def vigenere(text, key, direction):
-    # direction = 1 для шифрування, -1 для розшифрування
-    result = ""
-    key_index = 0
+# Віженер: кожна буква зсувається на номер відповідної букви ключа
+# ключ повторюється по колу: м а л и к м а л и к ...
+def vigenere_encrypt(text, key):
+    res = ""
+    i = 0
     for c in text:
         if c.lower() in alphabet:
-            key_letter = key[key_index % len(key)]
-            shift = alphabet.index(key_letter)
-            result = result + shift_letter(c, shift * direction)
-            key_index = key_index + 1
+            shift = alphabet.index(key[i % len(key)])
+            res = res + shift_letter(c, shift)
+            i = i + 1
         else:
-            result = result + c
-    return result
+            res = res + c
+    return res
 
 
-def vigenere_encrypt(text, key):
-    return vigenere(text, key, 1)
-
-
+# те саме, тільки зсув в іншу сторону
 def vigenere_decrypt(text, key):
-    return vigenere(text, key, -1)
+    res = ""
+    i = 0
+    for c in text:
+        if c.lower() in alphabet:
+            shift = alphabet.index(key[i % len(key)])
+            res = res + shift_letter(c, -shift)
+            i = i + 1
+        else:
+            res = res + c
+    return res
 
 
+# рахую яка буква зустрічається найчастіше
 def most_common_letter(text):
-    # частотний аналіз: яка літера зустрічається найчастіше
-    best_letter = ""
+    best = ""
     best_count = 0
     for letter in alphabet:
         count = text.lower().count(letter)
         if count > best_count:
             best_count = count
-            best_letter = letter
-    return best_letter, best_count
+            best = letter
+    return best, best_count
 
 
+# злом Цезаря: просто пробую всі зсуви і дивлюсь де вийде нормальний текст
 def brute_force(text):
-    # перебираємо всі можливі зсуви шифру Цезаря
     print("Злом шифру Цезаря перебором:")
     for shift in range(1, len(alphabet)):
         print(shift, caesar_decrypt(text, shift))
 
+
+# ---------- основна частина ----------
 
 print("Шифр Цезаря і шифр Віженера")
 text = input("Введіть текст (Enter - мій текст): ")
@@ -112,9 +122,11 @@ print("Віженер, ключ", vigenere_key, "(прізвище)")
 print("Зашифровано:  ", vigenere_text)
 print("Розшифровано: ", vigenere_decrypt(vigenere_text, vigenere_key))
 
+# порівняння двох шифрів
 print()
 print("Порівняння:")
 print("Довжина тексту:", len(text), "| Цезар:", len(caesar_text), "| Віженер:", len(vigenere_text))
+# у Цезаря 32 варіанти зсуву, у Віженера 33 в степені довжини ключа
 print("Кількість можливих ключів: Цезар", len(alphabet) - 1, "| Віженер (5 літер)", len(alphabet) ** 5)
 
 letter, count = most_common_letter(text)
